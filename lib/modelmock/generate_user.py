@@ -1,20 +1,17 @@
 import numpy as np
+import logging
 from modelmock.generate_data import provider
 import json,time,os
 class Main:
     def __init__(self,numbers):
         self.numbers = numbers
-    def __str__(self):
         try:
             if self.numbers > 0:
-                return str(self.numbers)
+                logging.warning(str(self.numbers))
             else:
-                print("n nhập vào phải lớn hơn 0")
-                exit()
-        except:
-            print( "n nhập vào phải là kiểu số lớn hơn 0")
-            exit()
-            
+                logging.warning("n nhập vào phải lớn hơn 0")
+        except TypeError:
+            logging.warning( "n nhập vào phải là kiểu số lớn hơn 0")
     def sum_str(self,list_):
         result = ''
         for i in list_:
@@ -48,37 +45,34 @@ class Main:
         return np.random.choice(provider.phone)+self.sum_str(np.random.choice(10,8).tolist())
     def check_unique(self):
         try:
-            try:
-                if not os.path.exists('users'):
-                    os.mkdir('users')
-                else:
-                    pass
-            except Exception as e:
+            if not os.path.exists('users'):
                 os.mkdir('users')
-                print(e)
-            lst_users = os.listdir('users')
-            if '.DS_Store' in lst_users:
-                lst_users.remove('.DS_Store')
             else:
                 pass
-            names = []
-            emails = [] 
-            phone_numbers = []
-            if len(lst_users)>=1:
-                for i in lst_users:
-                    with open('users/'+i,'r') as f:
-                        data = f.read()
-                        json_data = json.loads(data)
-                        for i in json_data:
-                            size = json_data[i]
-                            break
-                        for i in range(1,size+1):
-                            names.append(json_data['details']['user'+str(i)]['Full name'].encode('utf-8').decode('utf-8'))
-                            emails.append(json_data['details']['user'+str(i)]['Email'])
-                            phone_numbers.append(json_data['details']['user'+str(i)]['Phone number'])
-            return names,emails,phone_numbers
         except Exception as e:
-            print(e)
+            os.mkdir('users')
+            logging.warning(e)
+        lst_users = os.listdir('users')
+        if '.DS_Store' in lst_users:
+            lst_users.remove('.DS_Store')
+        else:
+            pass
+        names = []
+        emails = [] 
+        phone_numbers = []
+        if len(lst_users)>=1:
+            for i in lst_users:
+                with open('users/'+i,'r') as f:
+                    data = f.read()
+                    json_data = json.loads(data)
+                    for i in json_data:
+                        size = json_data[i]
+                        break
+                    for i in range(1,size+1):
+                        names.append(json_data['details']['user'+str(i)]['Full name'].encode('utf-8').decode('utf-8'))
+                        emails.append(json_data['details']['user'+str(i)]['Email'])
+                        phone_numbers.append(json_data['details']['user'+str(i)]['Phone number'])
+        return names,emails,phone_numbers
     def generation(self):
         # try:
         #     names,emails,phone_numbers = self.check_unique()
@@ -157,7 +151,7 @@ if __name__ == "__main__":
     time_start = time.time()
     n=int(input('Input n user : '))
     opject = Main(n) #construction
-    print(opject) # __str__ 
+    #print(opject) # __str__ 
     opject.printf() #print(json_output)
     opject.Savedata() #Save data to *.json
     '''
