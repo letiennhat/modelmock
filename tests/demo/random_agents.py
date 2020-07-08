@@ -8,7 +8,7 @@ from modelmock.faker import generate_agents
 _demo = os.environ.get('MODELMOCK_DEMO_GEN_AGENTS', '1')
 
 if _demo == '1':
-  pprint(list(generate_agents(100,
+  pprint(list(generate_agents(10,
       [
         {'level': 'ND', 'count': 1},
         {'level': 'RD', 'count': 2},
