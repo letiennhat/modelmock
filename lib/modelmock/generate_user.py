@@ -113,6 +113,20 @@ class Main:
         for i in range(len(namess)):
             dict_['user'+str(i+1)] = {"Full name":namess[i],"Email":emailss[i],"Phone number":phone_numberss[i]}
         return dic,[namess,emailss,phone_numberss]
+    def generate_user_info(self,list_dict):
+        dict_info = self.generation()[1]
+        names,emails,phones = dict_info[0],dict_info[1],dict_info[2]
+        lst = []
+        for i in range(len(dict_info[0])):
+            dic = {
+                'fullname': names[i],
+                'email': emails[i],
+                'phone': phones[i]
+            }
+            lst.append(dic)
+        for i in range(len(list_dict)):
+            lst[i].update(list_dict[i])
+        return lst
     def jsonload(self):
         json_ = json.dumps(self.generation()[0],indent=2).encode('utf-8')
         json_x = json_.decode('utf-8')

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+
 import random
+from modelmock.generate_user import Main
 from modelmock.utils import (
   array_random_split,
   chunkify,
@@ -11,16 +13,18 @@ from modelmock.utils import (
   flatten_sub_list,
   random_fixed_sum_array,
 )
-from modelmock.generate_user import Main
+
 # [BEGIN generate_agents()]
 
 def generate_agents(total_agents, level_mappings, subpath='record'):
   _records = shuffle_nodes(
-    flatten_sub_dict(
-      expand_treemap(
-        assign_levels(total_agents,None,
-          indices=list(shuffle_nodes(generate_ids(total_agents, 'A'))),
-          levels=level_mappings)
+    Main(total_agents).generate_user_info(
+      flatten_sub_dict(
+        expand_treemap(
+          assign_levels(None,
+            indices=list(shuffle_nodes(generate_ids(total_agents, 'A'))),
+            levels=level_mappings)
+        )
       )
     )
   )
@@ -29,10 +33,7 @@ def generate_agents(total_agents, level_mappings, subpath='record'):
   else:
     return _records
 
-def assign_levels(total_agents,super_id, indices, levels):
-  
-  current = levels[0]
-  levels = levels[1:]
+def assign_levels(super_id, indices, levels):
   if not isinstance(indices, list):
     raise TypeError('indices is invalid')
 
@@ -41,22 +42,14 @@ def assign_levels(total_agents,super_id, indices, levels):
   if not isinstance(indices, list) or len(indices) == 0:
     return ret
   if isinstance(levels, list) and len(levels) > 0:
-    A = Main(total_agents)
+    current = levels[0]
+    levels = levels[1:]
     if len(levels) == 0:
-      temp = 0
       for i in indices:
-        
-        fullname = A.generation()[1][0][temp]
-        email = A.generation()[1][1][temp]
-        phone = A.generation()[1][2][temp]
-        temp+=1
         item = dict(
           level=current['level'],
           index=i,
-          super=super_id,
-          fullname = fullname,
-          email=email,
-          phone=phone
+          super=super_id
         )
         ret.append(item)
     else:
@@ -69,28 +62,19 @@ def assign_levels(total_agents,super_id, indices, levels):
         _count = random.randint(_min, _max)
       # no any branch of this level
       if _count == 0:
-        return assign_levels(total_agents,super_id, indices, levels)
+        return assign_levels(super_id, indices, levels)
       # split the children
       group_len = _count if _count < len(indices) else len(indices)
       child_group = array_random_split(indices, group_len)
-      temp = 0
       for child in child_group:
         first_index = child[0]
         subchild = child[1:]
-
-        fullname = A.generation()[1][0][temp]
-        email = A.generation()[1][1][temp]
-        phone = A.generation()[1][2][temp]
-        temp+=1
         ret.append(dict(
           level=current['level'],
           index=first_index,
-          super=super_id,
-          fullname = fullname,
-          email=email,
-          phone=phone
+          super=super_id
         ))
-        ret = ret + assign_levels(total_agents,first_index, subchild, levels = levels)
+        ret = ret + assign_levels(first_index, subchild, levels = levels)
   return ret
 
 
@@ -109,6 +93,7 @@ def expand_treemap(nodes):
 
     for ref_label in _super_refs.keys():
       node['refs'][ref_label] = _super_refs[ref_label]
+
   return nodes
 
 # [END generate_agents()]
